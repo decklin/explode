@@ -1,0 +1,16 @@
+{
+  "name": "explode",
+  "version": "0.1",
+  "description": "Expand shortened URLs (e.g. TinyURL) with LongURL",
+  "background_page": "background.html",
+  "content_scripts": [
+    {
+      "js": [ "explode.js" ],
+      "matches": [ "http://*/*", "https://*/*" ]
+    }
+  ],
+  "permissions": [
+    "tabs",
+    "http://api.longurl.org/*"
+  ]
+}
