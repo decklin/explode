@@ -1,53 +1,33 @@
-/* My convenience function */
+/* I hate repeating myself. */
 
-function path_each(path, f) {
-    s = document.evaluate(path, document, null,
-        XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-    for (i = 0; node = s.snapshotItem(i); i++)
-        f(node);
+HTMLCollection.prototype.eltEach = function(f) {
+    for (var i = 0; i < this.length; i++) f(this[i]);
 }
 
-/* Set up our connection to the background page. When a link is hovered
- * over, we send the URL. */
+/* Pass every URL over; the background script decides which to
+ * process. */
 
-var port = chrome.extension.connect({name: "explodeUrlRequest"});
-path_each('//a', function(a) {
-    a.addEventListener('mouseover', function() {
-        port.postMessage({url: this.href});
-    }, false)
+var port = chrome.extension.connect({name: 'explodeUrlRequest'});
+
+document.links.eltEach(function(a) {
+    port.postMessage({url: a.href});
 });
 
-/* When we get messages back, we either highlight the link to show that
- * it's loading, or change the style back to normal and update it with the
- * expanded URL. Messages only include URLs, not which nodes they came
- * from -- so if there are more than one link on the page pointing to the
- * URL we just expanded, both will be updated. */
+/* Return messages only include short/long URLs, not which nodes they
+ * came from -- so if there are more than one link on the page
+ * pointing to the URL we just expanded, both will be updated. */
 
 chrome.extension.onConnect.addListener(function(port) {
     switch (port.name) {
-    case "explodeUrlLoading":
-        port.onMessage.addListener(highlightLinks);
-        break;
-    case "explodeUrlDone":
+    case 'explodeUrlDone':
         port.onMessage.addListener(updateLinks);
         break;
     }
 });
 
-function highlightLinks(msg) {
-    path_each('//a', function(a) {
-        if (a.href == msg.url && !a.exploding) {
-            a.appendChild(document.createTextNode("…"));
-            a.exploding = true;
-        }
-    });
-}
-
 function updateLinks(msg) {
-    path_each('//a', function(a) {
+    document.links.eltEach(function(a) {
         if (a.href == msg.url) {
-            a.exploding = false;
-            a.removeChild(a.lastChild);
             a.href = msg.longUrl;
             a.title = msg.title;
         }
