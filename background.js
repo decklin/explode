@@ -2,6 +2,8 @@ const FETCH_DELAY = 1000;
 var outstandingUrls = [];
 var currentUrl = null;
 
+function elts(root, t) { return root.getElementsByTagName(t); }
+
 /* Ah, irony. */
 
 NodeList.prototype.eltEach = function(f) {
@@ -12,7 +14,6 @@ NodeList.prototype.eltEach = function(f) {
 
 function xhrGet(url, callback) {
     var xhr = new XMLHttpRequest();
-    console.log('xhr: ' + url);
     xhr.open('GET', url, true);
     xhr.onreadystatechange = function(resp) {
         if (xhr.readyState == 4)
@@ -31,7 +32,7 @@ var services = {
 };
 
 xhrGet('http://api.longurl.org/v2/services', function(xhr) {
-    xhr.responseXML.getElementsByTagName('service').eltEach(function(s) {
+    elts(xhr.responseXML, 'service').eltEach(function(s) {
         services[s.textContent] = true;
     });
 });
@@ -72,15 +73,21 @@ function fetchUrls() {
         var url = currentUrl;
         xhrGet(expanderUrl(url), function(xhr) {
             localStorage[url] = JSON.stringify({
-                longUrl: xhr.responseXML.
-                    getElementsByTagName('long-url')[0].textContent,
-                title: xhr.responseXML.
-                    getElementsByTagName('title')[0].textContent
+                longUrl: extract(xhr, 'long-url'),
+                title: extract(xhr, 'title')
             });
             sendDone(url);
             currentUrl = null;
             setTimeout(fetchUrls, FETCH_DELAY);
         });
+    }
+}
+
+function extract(xhr, n) {
+    try {
+        return elts(xhr.responseXML, n)[0].textContent;
+    } catch(e) {
+        return null;
     }
 }
 
