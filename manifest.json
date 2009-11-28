@@ -1,6 +1,9 @@
 {
-  "name": "explode",
+  "name": "Explode",
   "version": "0.1",
+  "icons": {
+    "48": "icon48.png"
+  },
   "description": "Expand shortened URLs (e.g. TinyURL) with LongURL",
   "background_page": "background.html",
   "content_scripts": [
