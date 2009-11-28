@@ -70,16 +70,20 @@ function expanderUrl(url) {
 function fetchUrls() {
     if (!currentUrl && outstandingUrls.length > 0) {
         currentUrl = outstandingUrls.shift();
-        var url = currentUrl;
-        xhrGet(expanderUrl(url), function(xhr) {
-            localStorage[url] = JSON.stringify({
-                longUrl: extract(xhr, 'long-url'),
-                title: extract(xhr, 'title')
-            });
-            sendDone(url);
+        if (localStorage[currentUrl]) {
             currentUrl = null;
             setTimeout(fetchUrls, FETCH_DELAY);
-        });
+        } else {
+            xhrGet(expanderUrl(currentUrl), function(xhr) {
+                localStorage[currentUrl] = JSON.stringify({
+                    longUrl: extract(xhr, 'long-url'),
+                    title: extract(xhr, 'title')
+                });
+                sendDone(currentUrl);
+                currentUrl = null;
+                setTimeout(fetchUrls, FETCH_DELAY);
+            });
+        }
     }
 }
 
