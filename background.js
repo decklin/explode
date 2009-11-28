@@ -68,22 +68,22 @@ function expanderUrl(url) {
 }
 
 function fetchUrls() {
-    if (!currentUrl && outstandingUrls.length > 0) {
-        currentUrl = outstandingUrls.shift();
-        if (localStorage[currentUrl]) {
+    if (currentUrl || outstandingUrls.length == 0)
+        return;
+    currentUrl = outstandingUrls.shift();
+    if (!localStorage[currentUrl]) {
+        xhrGet(expanderUrl(currentUrl), function(xhr) {
+            localStorage[currentUrl] = JSON.stringify({
+                longUrl: extract(xhr, 'long-url'),
+                title: extract(xhr, 'title')
+            });
+            sendDone(currentUrl);
             currentUrl = null;
             setTimeout(fetchUrls, FETCH_DELAY);
-        } else {
-            xhrGet(expanderUrl(currentUrl), function(xhr) {
-                localStorage[currentUrl] = JSON.stringify({
-                    longUrl: extract(xhr, 'long-url'),
-                    title: extract(xhr, 'title')
-                });
-                sendDone(currentUrl);
-                currentUrl = null;
-                setTimeout(fetchUrls, FETCH_DELAY);
-            });
-        }
+        });
+    } else {
+        currentUrl = null;
+        setTimeout(fetchUrls, FETCH_DELAY);
     }
 }
 
