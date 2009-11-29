@@ -73,25 +73,21 @@ function fetchUrls() {
     currentUrl = outstandingUrls.shift();
     if (!localStorage[currentUrl]) {
         xhrGet(expanderUrl(currentUrl), function(xhr) {
-            localStorage[currentUrl] = JSON.stringify({
-                longUrl: extract(xhr, 'long-url'),
-                title: extract(xhr, 'title')
-            });
-            sendDone(currentUrl);
+            try {
+                localStorage[currentUrl] = JSON.stringify({
+                    longUrl: elts(xhr.responseXML, 'long-url')[0].textContent,
+                    title: elts(xhr.responseXML, 'title')[0].textContent
+                });
+                sendDone(currentUrl);
+            } catch (e) {
+                console.log('error: ' + currentUrl);
+            }
             currentUrl = null;
             setTimeout(fetchUrls, FETCH_DELAY);
         });
     } else {
         currentUrl = null;
         setTimeout(fetchUrls, FETCH_DELAY);
-    }
-}
-
-function extract(xhr, n) {
-    try {
-        return elts(xhr.responseXML, n)[0].textContent;
-    } catch(e) {
-        return null;
     }
 }
 
