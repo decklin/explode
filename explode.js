@@ -28,7 +28,7 @@ chrome.extension.onConnect.addListener(function(port) {
 function updateLinks(msg) {
     document.links.eltEach(function(a) {
         if (a.href == msg.url) {
-            a.href = msg.longUrl;
+            a.href = msg['long-url'];
             a.title = msg.title;
         }
     });
