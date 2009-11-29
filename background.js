@@ -1,4 +1,7 @@
 const FETCH_DELAY = 1000;
+const API_SERVICES = 'http://api.longurl.org/v2/services';
+const SERVICES_STALE = Date.now() - 86400 * 1000;
+
 var outstandingUrls = [];
 var currentUrl = null;
 
@@ -31,11 +34,17 @@ var services = {
     'flic.kr': true
 };
 
-xhrGet('http://api.longurl.org/v2/services', function(xhr) {
-    elts(xhr.responseXML, 'service').eltEach(function(s) {
-        services[s.textContent] = true;
+if (localStorage['services'] && localStorage['date'] > SERVICES_STALE) {
+    services = JSON.parse(localStorage['services']);
+} else {
+    xhrGet(API_SERVICES, function(xhr) {
+        localStorage['date'] = Date.parse(xhr.getResponseHeader('Date'));
+        elts(xhr.responseXML, 'service').eltEach(function(s) {
+            services[s.textContent] = true;
+        });
+        localStorage['services'] = JSON.stringify(services);
     });
-});
+}
 
 chrome.extension.onConnect.addListener(function(port) {
     switch (port.name) {
