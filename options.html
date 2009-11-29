@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Explode Options</title>
+</head>
+
+<body>
+  <h1>Explode</h1><script type="text/javascript">
+    document.write('<p>In cache: ' + localStorage.length + ' items');
+    var d = new Date(); d.setTime(localStorage['servicesExpire']);
+    document.write('<p>Services expire: ' + d);
+  </script>
+
+  <p><input type="button" value="Clear Cache" onclick=
+  "localStorage.clear(); window.location.reload()" /></p>
+</body>
+</html>

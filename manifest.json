@@ -6,6 +6,7 @@
   },
   "description": "Expand shortened URLs (e.g. TinyURL) with LongURL",
   "background_page": "background.html",
+  "options_page": "options.html",
   "content_scripts": [
     {
       "js": [ "explode.js" ],
