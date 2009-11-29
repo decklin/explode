@@ -1,8 +1,8 @@
 const USER_AGENT = 'Explode/0.1';
 const API_ROOT = 'http://api.longurl.org/v2/';
 const FETCH_DELAY = 1000;
-const SERVICES_STALE = Date.now() - 86400 * 1000;
-const additionalServices = ['j.mp', 'flic.kr', 'w33.us'];
+const SERVICES_CACHE_TIME = 86400 * 1000;
+const EXTRA_SERVICES = ['j.mp', 'flic.kr', 'w33.us'];
 
 var services = {};
 var outstandingUrls = [];
@@ -29,16 +29,17 @@ function apiUrl(method, params) {
 
 function loadCachedServices() {
     services = JSON.parse(localStorage['services']);
-    additionalServices.forEach(function(s) {
+    EXTRA_SERVICES.forEach(function(s) {
         services[s] = {host: s, regex: null};
     });
 }
 
-if (localStorage['services'] && localStorage['date'] > SERVICES_STALE) {
+if (localStorage['services'] && Date.now() < localStorage['servicesExpire']) {
     loadCachedServices();
 } else {
     xhrGet(apiUrl('services'), function(xhr) {
-        localStorage['date'] = Date.parse(xhr.getResponseHeader('Date'));
+        var date = Date.parse(xhr.getResponseHeader('Date'));
+        localStorage['servicesExpire'] = date + SERVICES_CACHE_TIME;
         localStorage['services'] = xhr.responseText;
         loadCachedServices();
     });
