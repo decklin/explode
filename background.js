@@ -1,4 +1,4 @@
-const USER_AGENT = 'Explode/0.1';
+const USER_AGENT = 'Explode/0.2';
 const API_ROOT = 'http://api.longurl.org/v2/';
 const FETCH_DELAY = 1000;
 const SERVICES_CACHE_TIME = 86400 * 1000;
@@ -21,7 +21,8 @@ function xhrGet(url, callback) {
 }
 
 function apiUrl(method, params) {
-    var url = API_ROOT + method + '?format=json&user-agent=Explode%2F0.1';
+    var url = API_ROOT + method + '?format=json&user-agent=' +
+        encodeURIComponent(USER_AGENT);
     for (k in params)
         url += '&' + k + '=' + encodeURIComponent(params[k]);
     return url;
