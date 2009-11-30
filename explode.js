@@ -11,6 +11,7 @@ HTMLCollection.prototype.eltEach = function(f) {
 document.links.eltEach(function(a) {
     chrome.extension.sendRequest({url: a.href}, function(resp) {
         a.href = resp['long-url'];
-        a.title = resp.title;
+        if (resp.title && !a.title)
+            a.title = resp.title;
     });
 });
