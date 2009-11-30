@@ -6,7 +6,9 @@ function restore() {
             var tr = document.createElement('tr');
             var info = JSON.parse(localStorage[k]);
             tr.innerHTML = '<td>' + k + '</td><td><a href="' +
-                info['long-url'] + '">' + info.title + '</a></td>';
+                info['long-url'] + '">' +
+                (info.title ? info.title : info['long-url'].split('/').pop()) +
+                '</a></td>';
             document.getElementById('urldetail').appendChild(tr);
         }
     }
@@ -19,7 +21,7 @@ function restore() {
             nsvcs++;
             var tr = document.createElement('tr');
             tr.innerHTML = '<td>' + services[k].domain + '</td><td>' +
-                services[k].regex + '</td>';
+                (services[k].regex ? services[k].regex : '') + '</td>';
             document.getElementById('svcdetail').appendChild(tr);
         }
         document.getElementById('nsvcs').innerHTML = nsvcs;
