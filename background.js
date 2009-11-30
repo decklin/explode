@@ -58,14 +58,19 @@ function handleReq(msg) {
         console.log('cached: ' + msg.url);
         sendDone(msg.url);
     } else {
-        var a = document.createElement('a');
-        a.href = msg.url;
-        if (services[a.hostname]) {
+        if (isShortenedUrl(msg.url)) {
             console.log('new: ' + msg.url);
             outstandingUrls.push(msg.url);
             fetchUrls();
         }
     }
+}
+
+function isShortenedUrl(url) {
+    var a = document.createElement('a');
+    a.href = url;
+    var svc = services[a.hostname];
+    return svc ? (svc.regex ? svc.regex.match(url) : true) : false;
 }
 
 function fetchUrls() {
