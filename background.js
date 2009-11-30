@@ -75,10 +75,14 @@ function fetchReqs() {
         fetchNextReq();
     } else {
         xhrGet(apiUrl('expand', {title: 1, url: curReq.url}), function(xhr) {
-            var resp = JSON.parse(xhr.responseText);
-            if (resp['long-url']) {
-                localStorage[curReq.url] = xhr.responseText;
-                sendDone(curReq);
+            try {
+                var resp = JSON.parse(xhr.responseText);
+                if (resp['long-url']) {
+                    localStorage[curReq.url] = xhr.responseText;
+                    sendDone(curReq);
+                }
+            } catch (e) {
+                console.log('error: ' + curReq.url);
             }
             fetchNextReq();
         });
