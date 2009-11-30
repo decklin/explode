@@ -3,14 +3,35 @@
 <html>
 <head>
   <title>Explode Options</title>
+  <script type="text/javascript" src="options.js" />
+  <style type="text/css">
+    body { color: #000; background: #f7f7f7; }
+    td { background: #eee; padding: 0.4em; }
+    th { background: #ddd; padding: 0.4em; }
+    .scroll { max-width: 75%; max-height: 12em; overflow-y: scroll; }
+  </style>
 </head>
 
-<body>
-  <h1>Explode</h1><script type="text/javascript">
-    document.write('<p>In cache: ' + localStorage.length + ' items');
-    var d = new Date(); d.setTime(localStorage['servicesExpire']);
-    document.write('<p>Services expire: ' + d);
-  </script>
+<body onload="restore()">
+  <h1>Explode</h1>
+
+  <p><span id="nurls">0</span> URLs in cache:</a></p>
+
+  <div class="scroll">
+  <table id="urldetail">
+    <tr><th>Short URL</th><th>Target</th></tr>
+  </table>
+  </div>
+
+  <p><span id="nsvcs">0</span> services in cache:</p>
+
+  <div class="scroll">
+  <table id="svcdetail">
+    <tr><th>Domain</th><th>Regex</th></tr>
+  </table>
+  </div>
+
+  <p>Service list <span id="svcstatus">status is unknown</span>.</p>
 
   <p><input type="button" value="Clear Cache" onclick=
   "localStorage.clear(); window.location.reload()" /></p>
