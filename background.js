@@ -5,8 +5,8 @@ const SERVICES_CACHE_TIME = 86400 * 1000;
 const EXTRA_SERVICES = ['j.mp', 'flic.kr', 'w33.us'];
 
 var services = {};
-var outstandingUrls = [];
-var currentUrl = null;
+var outstandingReqs = [];
+var curReq = null;
 
 /* An overly-simple XMLHttpRequest wrapper */
 
@@ -45,26 +45,19 @@ if (localStorage['services'] && Date.now() < localStorage['servicesExpire']) {
     });
 }
 
-chrome.extension.onConnect.addListener(function(port) {
-    switch (port.name) {
-    case 'explodeUrlRequest':
-        port.onMessage.addListener(handleReq);
-        break;
-    }
-});
-
-function handleReq(msg) {
-    if (localStorage[msg.url]) {
-        console.log('cached: ' + msg.url);
-        sendDone(msg.url);
+chrome.extension.onRequest.addListener(function(req, sender, callback) {
+    req.callback = callback;
+    if (localStorage[req.url]) {
+        console.log('cached: ' + req.url);
+        sendDone(req);
     } else {
-        if (isShortenedUrl(msg.url)) {
-            console.log('new: ' + msg.url);
-            outstandingUrls.push(msg.url);
-            fetchUrls();
+        if (isShortenedUrl(req.url)) {
+            console.log('new: ' + req.url);
+            outstandingReqs.push(req);
+            fetchReqs();
         }
     }
-}
+});
 
 function isShortenedUrl(url) {
     var a = document.createElement('a');
@@ -73,31 +66,26 @@ function isShortenedUrl(url) {
     return svc ? (svc.regex ? svc.regex.match(url) : true) : false;
 }
 
-function fetchUrls() {
-    if (currentUrl || outstandingUrls.length == 0)
+function fetchReqs() {
+    if (curReq || outstandingReqs.length == 0)
         return;
-    currentUrl = outstandingUrls.shift();
-    if (localStorage[currentUrl]) {
-        fetchNextUrl();
+    curReq = outstandingReqs.shift();
+    if (localStorage[curReq.url]) {
+        fetchNextReq();
     } else {
-        xhrGet(apiUrl('expand', {title: 1, url: currentUrl}), function(xhr) {
-            localStorage[currentUrl] = xhr.responseText;
-            sendDone(currentUrl);
-            fetchNextUrl();
+        xhrGet(apiUrl('expand', {title: 1, url: curReq.url}), function(xhr) {
+            localStorage[curReq.url] = xhr.responseText;
+            sendDone(curReq);
+            fetchNextReq();
         });
     }
 }
 
-function fetchNextUrl() {
-    currentUrl = null;
-    setTimeout(fetchUrls, FETCH_DELAY);
+function fetchNextReq() {
+    curReq = null;
+    setTimeout(fetchReqs, FETCH_DELAY);
 }
 
-function sendDone(url) {
-    chrome.tabs.getSelected(null, function(tab) {
-        var port = chrome.tabs.connect(tab.id, {name: 'explodeUrlDone'});
-        var msg = JSON.parse(localStorage[url]);
-        msg['url'] = url;
-        port.postMessage(msg);
-    });
+function sendDone(req) {
+    req.callback(JSON.parse(localStorage[req.url]));
 }
