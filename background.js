@@ -50,7 +50,7 @@ chrome.extension.onRequest.addListener(function(req, sender, callback) {
     req.callback = callback;
     if (localStorage[req.url]) {
         console.log('cached: ' + req.url);
-        sendDone(req);
+        updateLink(req);
     } else {
         if (isShortenedUrl(req.url)) {
             console.log('new: ' + req.url);
@@ -72,7 +72,7 @@ function fetchReqs() {
         return;
     curReq = outstandingReqs.shift();
     if (localStorage[curReq.url]) {
-        sendDone(curReq);
+        updateLink(curReq);
         fetchNextReq();
     } else {
         xhrGet(apiUrl('expand', {title: 1, url: curReq.url}), function(xhr) {
@@ -80,7 +80,7 @@ function fetchReqs() {
                 var resp = JSON.parse(xhr.responseText);
                 if (resp['long-url']) {
                     localStorage[curReq.url] = xhr.responseText;
-                    sendDone(curReq);
+                    updateLink(curReq);
                 }
             } catch (e) {
                 console.log('error: ' + curReq.url);
@@ -95,7 +95,7 @@ function fetchNextReq() {
     setTimeout(fetchReqs, FETCH_DELAY);
 }
 
-function sendDone(req) {
+function updateLink(req) {
     var info = JSON.parse(localStorage[req.url]);
     if (localStorage['mungeLinks'] == 'true') info.mungeUrl = req.url;
     req.callback(info);
