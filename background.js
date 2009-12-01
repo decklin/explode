@@ -1,6 +1,6 @@
 const USER_AGENT = 'Explode/0.3';
 const API_ROOT = 'http://api.longurl.org/v2/';
-const FETCH_DELAY = 1000;
+const FETCH_DELAY = 800;
 const SERVICES_CACHE_TIME = 86400 * 1000;
 const EXTRA_SERVICES = ['j.mp', 'flic.kr', 'w33.us', 'guao.cc', 'jan.io'];
 
