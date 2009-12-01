@@ -33,7 +33,7 @@ function restore() {
 
     var exp = localStorage['servicesExpire'];
     elt(document, 'svcstatus').innerHTML = exp ? 'cached until ' +
-        new Date(+exp) : 'not cached';
+        new Date(+exp) : 'will be reloaded on restart';
 }
 
 function setMunge(checked) {
@@ -47,9 +47,7 @@ function clearUrls() {
     }
 }
 
-function fetchServices() {
-    /* Implement this for real (i.e. send a message to the background
-     * script, wait for it to xhr) later. */
+function clearServices() {
     localStorage.removeItem('services');
     localStorage.removeItem('servicesExpire');
 }
