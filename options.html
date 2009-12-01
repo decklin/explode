@@ -15,7 +15,8 @@
 <body onload="restore()">
   <h1>Explode</h1>
 
-  <p><span id="nurls">0</span> URLs in cache:</p>
+  <p><span id="nurls">0</span> URLs in cache <input type="button"
+    value="Clear" onclick="clearUrls(); window.location.reload()" /></p>
 
   <div class="scroll">
   <table id="urldetail">
@@ -23,7 +24,8 @@
   </table>
   </div>
 
-  <p><span id="nsvcs">0</span> services in cache:</p>
+  <p><span id="nsvcs">0</span> services in cache <input type="button"
+    value="Update" onclick="fetchServices(); window.location.reload()" /></p>
 
   <div class="scroll">
   <table id="svcdetail">
@@ -32,8 +34,5 @@
   </div>
 
   <p>Service list <span id="svcstatus">status is unknown</span>.</p>
-
-  <p><input type="button" value="Clear Cache" onclick=
-  "localStorage.clear(); window.location.reload()" /></p>
 </body>
 </html>

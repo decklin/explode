@@ -1,4 +1,8 @@
+function elt(root, id) { return root.getElementById(id); }
+
 function restore() {
+    elt(document, 'munge').checked = (localStorage['mungeLinks'] == 'true');
+
     var nurls = 0;
     for (var k in localStorage) {
         if (k.match(/^http:/)) {
@@ -9,10 +13,10 @@ function restore() {
                 info['long-url'] + '">' +
                 (info.title ? info.title : info['long-url'].split('/').pop()) +
                 '</a></td>';
-            document.getElementById('urldetail').appendChild(tr);
+            elt(document, 'urldetail').appendChild(tr);
         }
     }
-    document.getElementById('nurls').innerHTML = nurls;
+    elt(document, 'nurls').innerHTML = nurls;
 
     if (localStorage['services']) {
         var services = JSON.parse(localStorage['services']);
@@ -22,12 +26,27 @@ function restore() {
             var tr = document.createElement('tr');
             tr.innerHTML = '<td>' + services[k].domain + '</td><td>' +
                 (services[k].regex ? services[k].regex : '') + '</td>';
-            document.getElementById('svcdetail').appendChild(tr);
+            elt(document, 'svcdetail').appendChild(tr);
         }
-        document.getElementById('nsvcs').innerHTML = nsvcs;
+        elt(document, 'nsvcs').innerHTML = nsvcs;
     }
 
     var exp = localStorage['servicesExpire'];
-    document.getElementById('svcstatus').innerHTML =
-        exp ? 'cached until ' + new Date(+exp) : 'not cached';
+    elt(document, 'svcstatus').innerHTML = exp ? 'cached until ' +
+        new Date(+exp) : 'not cached';
+}
+
+function clearUrls() {
+    for (var k in localStorage) {
+        if (k.match(/^http:/)) {
+            localStorage.removeItem(k);
+        }
+    }
+}
+
+function fetchServices() {
+    /* Implement this for real (i.e. send a message to the background
+     * script, wait for it to xhr) later. */
+    localStorage.removeItem('services');
+    localStorage.removeItem('servicesExpire');
 }
