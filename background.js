@@ -72,6 +72,7 @@ function fetchReqs() {
         return;
     curReq = outstandingReqs.shift();
     if (localStorage[curReq.url]) {
+        sendDone(curReq);
         fetchNextReq();
     } else {
         xhrGet(apiUrl('expand', {title: 1, url: curReq.url}), function(xhr) {
