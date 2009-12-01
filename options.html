@@ -15,6 +15,10 @@
 <body onload="restore()">
   <h1>Explode</h1>
 
+  <p><input id="munge" type="checkbox" onchange="setMunge(this.checked)"
+  /> <label for="munge">Change link text to long URL if it matches
+  short URL</label></p>
+
   <p><span id="nurls">0</span> URLs in cache <input type="button"
     value="Clear" onclick="clearUrls(); window.location.reload()" /></p>
 

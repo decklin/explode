@@ -36,6 +36,10 @@ function restore() {
         new Date(+exp) : 'not cached';
 }
 
+function setMunge(checked) {
+    localStorage['mungeLinks'] = checked;
+}
+
 function clearUrls() {
     for (var k in localStorage) {
         if (k.match(/^http:/)) {

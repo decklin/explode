@@ -95,5 +95,7 @@ function fetchNextReq() {
 }
 
 function sendDone(req) {
-    req.callback(JSON.parse(localStorage[req.url]));
+    var info = JSON.parse(localStorage[req.url]);
+    if (localStorage['mungeLinks'] == 'true') info.mungeUrl = req.url;
+    req.callback(info);
 }
