@@ -8,7 +8,7 @@ var services = {};
 var outstandingReqs = [];
 var curReq = null;
 
-/* An overly-simple XMLHttpRequest wrapper */
+/* Functions for dealing with the LongURL API */
 
 function xhrGet(url, callback) {
     var xhr = new XMLHttpRequest();
@@ -28,6 +28,8 @@ function apiUrl(method, params) {
     return url;
 }
 
+/* Setup the service list; fetch and cache again if needed */
+
 function loadCachedServices() {
     services = JSON.parse(localStorage['services']);
     EXTRA_SERVICES.forEach(function(s) {
@@ -46,6 +48,18 @@ if (localStorage['services'] && Date.now() < localStorage['servicesExpire']) {
     });
 }
 
+/* Handle a bunch of requests from the content script. We stuff the
+ * callback into req so we can pull it out later. All the requests
+ * should finish coming in almost immediately, at which point the first
+ * req's XHR will be running and the rest will be queued up. */
+
+function isShortenedUrl(url) {
+    var a = document.createElement('a');
+    a.href = url;
+    var svc = services[a.hostname];
+    return svc ? (svc.regex ? svc.regex.match(url) : true) : false;
+}
+
 chrome.extension.onRequest.addListener(function(req, sender, callback) {
     req.callback = callback;
     if (localStorage[req.url]) {
@@ -60,12 +74,7 @@ chrome.extension.onRequest.addListener(function(req, sender, callback) {
     }
 });
 
-function isShortenedUrl(url) {
-    var a = document.createElement('a');
-    a.href = url;
-    var svc = services[a.hostname];
-    return svc ? (svc.regex ? svc.regex.match(url) : true) : false;
-}
+/* The main loop, so to speak. */
 
 function fetchReqs() {
     if (curReq || outstandingReqs.length == 0)
@@ -94,6 +103,9 @@ function fetchNextReq() {
     curReq = null;
     setTimeout(fetchReqs, FETCH_DELAY);
 }
+
+/* And here's where we actually invoke the callback once the URL and
+ * title come back from LongURL. */
 
 function updateLink(req) {
     var info = JSON.parse(localStorage[req.url]);

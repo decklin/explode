@@ -1,5 +1,3 @@
-/* I hate repeating myself. */
-
 HTMLCollection.prototype.eltEach = function(f) {
     for (var i = 0; i < this.length; i++) f(this[i]);
 }

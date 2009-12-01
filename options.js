@@ -42,9 +42,8 @@ function setMunge(checked) {
 
 function clearUrls() {
     for (var k in localStorage) {
-        if (k.match(/^http:/)) {
+        if (k.match(/^http:/))
             localStorage.removeItem(k);
-        }
     }
 }
 
