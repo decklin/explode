@@ -12,7 +12,7 @@ function reqLinks(root) {
             if (resp.mungeUrl && a.textContent == resp.mungeUrl)
                 a.textContent = resp['long-url'];
             if (resp.title && !a.title)
-                a.title = resp.title;
+                a.title = resp.title.replace(/\s+/g, ' ');
         });
     });
 }
