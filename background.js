@@ -138,6 +138,6 @@ function loadResponse(t) {
 function updateLink(req) {
     var info = JSON.parse(localStorage[req.url]);
     info.url = req.url;
-    info.munge = localStorage['mungeLinks'];
+    info.munge = localStorage['mungeLinks'] == 'true';
     req.port.postMessage(info);
 }
