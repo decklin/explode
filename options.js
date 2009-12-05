@@ -9,9 +9,9 @@ function restore() {
             nurls++;
             var tr = document.createElement('tr');
             var info = JSON.parse(localStorage[k]);
-            tr.innerHTML = '<td>' + k + '</td><td><a href="' +
-                info['long-url'] + '">' +
-                (info.title ? info.title : info['long-url'].split('/').pop()) +
+            tr.innerHTML = '<td>' + k + '</td>' +
+                '<td><a href="' + info.longUrl + '">' +
+                (info.title ? info.title : info.longUrl.split('/').pop()) +
                 '</a></td>';
             elt(document, 'urldetail').appendChild(tr);
         }

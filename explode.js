@@ -22,21 +22,19 @@ document.body.addEventListener('DOMNodeInserted', function(ev) {
         reqLinks(ev.srcElement);
 });
 
-function clean(s) {
-    return s ? s.replace(/\s+/g, ' ') : null;
-}
-
 port.onMessage.addListener(function (msg) {
     each(elts(document, 'a'), function (a) {
         if (a.href == msg.url) {
             if (msg.loading) {
-                a.origTitle = a.title;
+                a.origTitle = a.title || null;
                 a.title = 'Loading URL...';
+            } else if (msg.failed) {
+                a.title = 'Error loading URL';
             } else {
-                a.href = msg['long-url'];
-                a.title = a.origTitle || clean(msg.title);
+                a.href = msg.longUrl;
+                a.title = a.origTitle || msg.title;
                 if (msg.munge && a.textContent == msg.url)
-                    a.textContent = msg['long-url'];
+                    a.textContent = msg.longUrl;
             }
         }
     });

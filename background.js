@@ -96,14 +96,12 @@ function fetchReqs() {
         fetchNextReq();
     } else {
         xhrGet(apiUrl('expand', {title: 1, url: curReq.url}), function(xhr) {
-            try {
-                var resp = JSON.parse(xhr.responseText);
-                if (resp['long-url']) {
-                    localStorage[curReq.url] = xhr.responseText;
-                    updateLink(curReq);
-                }
-            } catch (e) {
-                console.log('error: ' + curReq.url);
+            var res = loadResponse(xhr.responseText);
+            if (res) {
+                localStorage[curReq.url] = JSON.stringify(res);
+                updateLink(curReq);
+            } else {
+                curReq.port.postMessage({url: curReq.url, failed: true});
             }
             fetchNextReq();
         });
@@ -113,6 +111,25 @@ function fetchReqs() {
 function fetchNextReq() {
     curReq = null;
     setTimeout(fetchReqs, FETCH_DELAY);
+}
+
+function normalize(s) {
+    /* XXX: interpret entities. */
+    return s ? s.replace(/\s+/g, ' ') : null;
+}
+
+function loadResponse(t) {
+    try {
+        var res = JSON.parse(t);
+        if (res['long-url']) {
+            return { longUrl: res['long-url'], title: normalize(res.title) };
+        } else {
+            console.log('error: ' + t);
+        }
+    } catch (e) {
+        console.log('no reply: ' + curReq.url);
+    }
+    return null;
 }
 
 /* And here's where we actually invoke the callback once the URL and
