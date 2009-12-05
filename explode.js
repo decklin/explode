@@ -1,19 +1,14 @@
-/* Just create a ton of closures. The background script will only hold on
- * to the ones representing shortened URLs. This saves us from having to
- * track which tab a request came from or doing any more DOM searching. */
-
 function elts(root, t) { return root.getElementsByTagName(t); }
 function each(list, f) { for (var i = 0; i < list.length; i++) f(list[i]); }
 
+/* All we send over the port is the URL; the background page decides if
+ * it needs expansion. */
+
+var port = chrome.extension.connect({name: 'explodeUrlRequest'});
+
 function reqLinks(root) {
     each(elts(root, 'a'), function(a) {
-        chrome.extension.sendRequest({url: a.href}, function(resp) {
-            a.href = resp['long-url'];
-            if (resp.mungeUrl && a.textContent == resp.mungeUrl)
-                a.textContent = resp['long-url'];
-            if (resp.title && !a.title)
-                a.title = resp.title.replace(/\s+/g, ' ');
-        });
+        port.postMessage({url: a.href});
     });
 }
 
@@ -25,4 +20,24 @@ reqLinks(document);
 document.body.addEventListener('DOMNodeInserted', function(ev) {
     if (ev.srcElement.nodeType != 3)
         reqLinks(ev.srcElement);
+});
+
+function clean(s) {
+    return s ? s.replace(/\s+/g, ' ') : null;
+}
+
+port.onMessage.addListener(function (msg) {
+    each(elts(document, 'a'), function (a) {
+        if (a.href == msg.url) {
+            if (msg.loading) {
+                a.origTitle = a.title;
+                a.title = 'Loading URL...';
+            } else {
+                a.href = msg['long-url'];
+                a.title = a.origTitle || clean(msg.title);
+                if (msg.munge && a.textContent == msg.url)
+                    a.textContent = msg['long-url'];
+            }
+        }
+    });
 });

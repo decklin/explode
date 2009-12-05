@@ -61,19 +61,29 @@ function isShortenedUrl(url) {
     return svc ? (svc.regex ? svc.regex.match(url) : true) : false;
 }
 
-chrome.extension.onRequest.addListener(function(req, sender, callback) {
-    req.callback = callback;
+chrome.extension.onConnect.addListener(function (port) {
+    switch (port.name) {
+    case 'explodeUrlRequest':
+        port.onMessage.addListener(function (req) {
+            handleReq(req, port);
+        });
+    }
+});
+
+function handleReq(req, port) {
+    req.port = port;
     if (localStorage[req.url]) {
         console.log('cached: ' + req.url);
         updateLink(req);
     } else {
         if (isShortenedUrl(req.url)) {
             console.log('new: ' + req.url);
+            port.postMessage({url: req.url, loading: true});
             outstandingReqs.push(req);
             fetchReqs();
         }
     }
-});
+}
 
 /* The main loop, so to speak. */
 
@@ -110,6 +120,7 @@ function fetchNextReq() {
 
 function updateLink(req) {
     var info = JSON.parse(localStorage[req.url]);
-    if (localStorage['mungeLinks'] == 'true') info.mungeUrl = req.url;
-    req.callback(info);
+    info.url = req.url;
+    info.munge = localStorage['mungeLinks'];
+    req.port.postMessage(info);
 }
