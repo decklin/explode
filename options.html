@@ -5,38 +5,39 @@
   <title>Explode Options</title>
   <script type="text/javascript" src="options.js" />
   <style type="text/css">
-    body { color: #000; background: #f7f7f7; }
+    body { color: #000; background: #f7f7f7; margin: 0 2em 0 2em; }
     td { background: #eee; padding: 0.4em; }
     th { background: #ddd; padding: 0.4em; }
-    .scroll { max-width: 75%; max-height: 12em; overflow-y: scroll; }
+    #urls { width: 100%; height: 12em; overflow-y: scroll; }
+    #svctext { width: 100%; height: 6em; }
+    #extras { width: 100%; height: 3em; }
   </style>
 </head>
 
 <body onload="restore()">
   <h1>Explode</h1>
 
-  <p><input id="munge" type="checkbox" onchange="setMunge(this.checked)"
-  /> <label for="munge">Change link text to long URL if it matches
-  short URL</label></p>
-
   <p><span id="nurls">0</span> URLs in cache <input type="button"
     value="Clear" onclick="clearUrls(); window.location.reload()" /></p>
 
-  <div class="scroll">
+  <div id="urls">
   <table id="urldetail">
     <tr><th>Short URL</th><th>Target</th></tr>
   </table>
   </div>
 
-  <p><span id="nsvcs">0</span> services in cache <input type="button"
+  <p><span id="nsvcs">0</span> services in cache
+    (<span id="svcstatus">status unknown</span>) <input type="button"
     value="Clear" onclick="clearServices(); window.location.reload()" /></p>
 
-  <div class="scroll">
-  <table id="svcdetail">
-    <tr><th>Domain</th><th>Regex</th></tr>
-  </table>
-  </div>
+  <p><textarea id="svctext"></textarea></p>
 
-  <p>Service list <span id="svcstatus">status is unknown</span>.</p>
+  <p>Additional services (separate with spaces):</p>
+  <p><textarea id="extras" onchange="setExtraServices(this.value)"
+    cols="70"></textarea></p>
+
+  <p><input id="munge" type="checkbox" onchange="setMunge(this.checked)" />
+    <label for="munge">Change link text to long URL if it matches
+    short URL</label></p>
 </body>
 </html>

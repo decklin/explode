@@ -20,24 +20,30 @@ function restore() {
 
     if (localStorage['services']) {
         var services = JSON.parse(localStorage['services']);
-        var nsvcs = 0;
+        var nsvcs = 0, svctext = '';
         for (var k in services) {
             nsvcs++;
-            var tr = document.createElement('tr');
-            tr.innerHTML = '<td>' + services[k].domain + '</td><td>' +
-                (services[k].regex ? services[k].regex : '') + '</td>';
-            elt(document, 'svcdetail').appendChild(tr);
+            svctext += services[k].domain +
+                (services[k].regex ? ' ('+services[k].regex+')': '') + ', ';
         }
         elt(document, 'nsvcs').innerHTML = nsvcs;
+        elt(document, 'svctext').innerHTML = svctext;
     }
 
     var exp = localStorage['servicesExpire'];
     elt(document, 'svcstatus').innerHTML = exp ? 'cached until ' +
-        new Date(+exp) : 'will be reloaded on restart';
+        new Date(+exp) : 'will be reloaded on use';
+
+    if (localStorage['extraServices'])
+        elt(document, 'extras').innerHTML = localStorage['extraServices'];
 }
 
 function setMunge(checked) {
     localStorage['mungeLinks'] = checked;
+}
+
+function setExtraServices(hostnames) {
+    localStorage['extraServices'] = hostnames;
 }
 
 function clearUrls() {

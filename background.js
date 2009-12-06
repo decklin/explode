@@ -2,8 +2,6 @@ const USER_AGENT = 'Explode/0.5';
 const API_ROOT = 'http://api.longurl.org/v2/';
 const FETCH_DELAY = 800;
 const SERVICES_CACHE_TIME = 86400 * 1000;
-const EXTRA_SERVICES = ['j.mp', 'flic.kr', 'w33.us', 'guao.cc', 'jan.io',
-                        'disq.us'];
 
 var outstandingReqs = [];
 var curReq = null;
@@ -32,9 +30,11 @@ function apiUrl(method, params) {
 
 function loadCachedServices() {
     var services = JSON.parse(localStorage['services']);
-    EXTRA_SERVICES.forEach(function(s) {
-        services[s] = {host: s, regex: null};
-    });
+    if (localStorage['extraServices']) {
+        localStorage['extraServices'].split(' ').forEach(function(s) {
+            services[s] = {host: s, regex: null};
+        });
+    }
     return services;
 }
 
