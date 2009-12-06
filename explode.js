@@ -25,12 +25,13 @@ document.body.addEventListener('DOMNodeInserted', function(ev) {
 port.onMessage.addListener(function (msg) {
     each(elts(document, 'a'), function (a) {
         if (a.href == msg.url) {
-            if (msg.loading) {
+            if (msg.loading && !a.loading) {
+                a.loading = true;
                 a.origTitle = a.title || null;
                 a.title = 'Loading URL...';
             } else if (msg.failed) {
                 a.title = 'Error loading URL';
-            } else {
+            } else if (msg.longUrl) {
                 a.href = msg.longUrl;
                 a.title = a.origTitle || msg.title;
                 if (msg.munge && a.textContent == msg.url)
