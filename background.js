@@ -108,8 +108,9 @@ function fetchNextReq() {
 }
 
 function normalize(s) {
-    /* XXX: interpret entities. */
-    return s ? s.replace(/\s+/g, ' ') : null;
+    var textarea = document.createElement('textarea');
+    if (s) textarea.innerHTML = s.replace(/\s+/g, ' ');
+    return textarea.value;
 }
 
 function loadResponse(t) {
