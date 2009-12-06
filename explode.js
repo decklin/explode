@@ -1,26 +1,32 @@
 function elts(root, t) { return root.getElementsByTagName(t); }
 function each(list, f) { for (var i = 0; i < list.length; i++) f(list[i]); }
 
-/* All we send over the port is the URL; the background page decides if
- * it needs expansion. */
+/* As of 0.6, the content script is responsible for knowing about which
+ * services are available. This lets us cut down dramatically on the number
+ * of requests sent to the background page (which requests seem to leak
+ * memory, as of r33808). */
+
+chrome.extension.sendRequest({servicesPlease: true}, function(res) {
+    reqLinks(document, res.services);
+    document.body.addEventListener('DOMNodeInserted', function(ev) {
+        if (ev.srcElement.nodeType != 3)
+            reqLinks(ev.srcElement, res.services);
+    });
+});
+
+/* Open the channel and send stuff over. */
 
 var port = chrome.extension.connect({name: 'explodeUrlRequest'});
 
-function reqLinks(root) {
+function reqLinks(root, services) {
     each(elts(root, 'a'), function(a) {
-        port.postMessage({url: a.href});
+        var srv = services[a.hostname];
+        if (srv && (srv.regex ? srv.regex.match(a.href) : a.pathname != '/'))
+            port.postMessage({url: a.href});
     });
 }
 
-/* Must do that once on init and again when a new node is inserted (e.g.
- * twitter.com AJAX updates) */
-
-reqLinks(document);
-
-document.body.addEventListener('DOMNodeInserted', function(ev) {
-    if (ev.srcElement.nodeType != 3)
-        reqLinks(ev.srcElement);
-});
+/* When we get a message back, update every anchor with a matching href. */
 
 port.onMessage.addListener(function (msg) {
     each(elts(document, 'a'), function (a) {

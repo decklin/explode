@@ -5,7 +5,6 @@ const SERVICES_CACHE_TIME = 86400 * 1000;
 const EXTRA_SERVICES = ['j.mp', 'flic.kr', 'w33.us', 'guao.cc', 'jan.io',
                         'disq.us'];
 
-var services = {};
 var outstandingReqs = [];
 var curReq = null;
 
@@ -32,34 +31,32 @@ function apiUrl(method, params) {
 /* Setup the service list; fetch and cache again if needed */
 
 function loadCachedServices() {
-    services = JSON.parse(localStorage['services']);
+    var services = JSON.parse(localStorage['services']);
     EXTRA_SERVICES.forEach(function(s) {
         services[s] = {host: s, regex: null};
     });
+    return services;
 }
 
-if (localStorage['services'] && Date.now() < localStorage['servicesExpire']) {
-    loadCachedServices();
-} else {
-    xhrGet(apiUrl('services'), function(xhr) {
-        var date = Date.parse(xhr.getResponseHeader('Date'));
-        localStorage['servicesExpire'] = date + SERVICES_CACHE_TIME;
-        localStorage['services'] = xhr.responseText;
-        loadCachedServices();
-    });
-}
+chrome.extension.onRequest.addListener(function(req, sender, callback) {
+    if (req.servicesPlease) {
+        if (localStorage['servicesExpire'] > Date.now()) {
+            callback({services: loadCachedServices()});
+        } else {
+            xhrGet(apiUrl('services'), function(xhr) {
+                var date = Date.parse(xhr.getResponseHeader('Date'));
+                localStorage['services'] = xhr.responseText;
+                localStorage['servicesExpire'] = date + SERVICES_CACHE_TIME;
+                callback({services: loadCachedServices()});
+            });
+        }
+    }
+});
 
 /* Handle a bunch of requests from the content script. We stuff the
  * callback into req so we can pull it out later. All the requests
  * should finish coming in almost immediately, at which point the first
  * req's XHR will be running and the rest will be queued up. */
-
-function isShortenedUrl(url) {
-    var a = document.createElement('a');
-    a.href = url;
-    var svc = services[a.hostname];
-    return svc ? (svc.regex ? svc.regex.match(url) : true) : false;
-}
 
 chrome.extension.onConnect.addListener(function (port) {
     switch (port.name) {
@@ -71,17 +68,14 @@ chrome.extension.onConnect.addListener(function (port) {
 });
 
 function handleReq(req, port) {
-    req.port = port;
     if (localStorage[req.url]) {
         console.log('cached: ' + req.url);
-        updateLink(req);
+        updateLink({url: req.url, port: port});
     } else {
-        if (isShortenedUrl(req.url)) {
-            console.log('new: ' + req.url);
-            port.postMessage({url: req.url, loading: true});
-            outstandingReqs.push(req);
-            fetchReqs();
-        }
+        console.log('new: ' + req.url);
+        port.postMessage({url: req.url, loading: true});
+        outstandingReqs.push({url: req.url, port: port});
+        fetchReqs();
     }
 }
 
