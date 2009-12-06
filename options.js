@@ -23,15 +23,14 @@ function restore() {
         var nsvcs = 0, svctext = '';
         for (var k in services) {
             nsvcs++;
-            svctext += services[k].domain +
-                (services[k].regex ? ' ('+services[k].regex+')': '') + ', ';
+            svctext += services[k].domain + ' ';
         }
         elt(document, 'nsvcs').innerHTML = nsvcs;
         elt(document, 'svctext').innerHTML = svctext;
     }
 
     var exp = localStorage['servicesExpire'];
-    elt(document, 'svcstatus').innerHTML = exp ? 'cached until ' +
+    elt(document, 'svcstatus').innerHTML = exp ? 'until ' +
         new Date(+exp) : 'will be reloaded on use';
 
     if (localStorage['extraServices'])
