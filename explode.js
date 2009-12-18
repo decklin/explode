@@ -21,7 +21,7 @@ var port = chrome.extension.connect({name: 'explodeUrlRequest'});
 function reqLinks(root, services) {
     each(elts(root, 'a'), function(a) {
         if (a.hostname in services &&
-                a.href.match(new RegExp(a.hostname+'/[^/?#]+$')))
+                a.href.match(new RegExp(a.hostname+'(/[a-z])?/[^/?#]+$')))
             port.postMessage({url: a.href});
     });
 }
