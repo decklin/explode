@@ -2,7 +2,7 @@ const USER_AGENT = 'Explode/0.6';
 const API_ROOT = 'http://api.longurl.org/v2/';
 const FETCH_DELAY = 800;
 const SERVICES_CACHE_TIME = 86400 * 1000;
-const DEFAULT_SERVICES = [
+const DEFAULT_EXTRAS = [
     '3.ly',
     'disq.us',
     'dlvr.it',
@@ -21,7 +21,7 @@ const DEFAULT_SERVICES = [
 ];
 
 if (!localStorage['extraServices'])
-    localStorage['extraServices'] = DEFAULT_SERVICES.join(' ');
+    localStorage['extraServices'] = DEFAULT_EXTRAS.join(' ');
 
 var outstandingReqs = [];
 var curReq = null;
