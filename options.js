@@ -26,7 +26,7 @@ function restore() {
             svctext += services[k].domain + ' ';
         }
         elt(document, 'nsvcs').innerHTML = nsvcs;
-        elt(document, 'svctext').innerHTML = svctext;
+        elt(document, 'svcs').innerHTML = svctext;
     }
 
     var exp = localStorage['servicesExpire'];
@@ -37,12 +37,9 @@ function restore() {
         elt(document, 'extras').innerHTML = localStorage['extraServices'];
 }
 
-function setMunge(checked) {
-    localStorage['mungeLinks'] = checked;
-}
-
-function setExtraServices(hostnames) {
-    localStorage['extraServices'] = hostnames;
+function save() {
+    localStorage['mungeLinks'] = elt(document, 'munge').checked;
+    localStorage['extraServices'] = elt(document, 'extras').value;
 }
 
 function clearUrls() {

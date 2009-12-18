@@ -3,13 +3,13 @@
 <html>
 <head>
   <title>Explode Options</title>
-  <script type="text/javascript" src="options.js" />
+  <script type="text/javascript" src="options.js"></script>
   <style type="text/css">
-    body { color: #000; background: #f7f7f7; margin: 0 2em 0 2em; }
+    body { color: #000; background: #f7f7f7; width: 90%; margin: auto; }
     td { background: #eee; padding: 0.4em; }
     th { background: #ddd; padding: 0.4em; }
     #urls { width: 100%; height: 12em; overflow-y: scroll; }
-    #svctext { width: 100%; height: 6em; }
+    #svcs { width: 100%; background: #eee; height: 6em; overflow-y: scroll; }
     #extras { width: 100%; height: 3em; }
   </style>
 </head>
@@ -30,14 +30,14 @@
     (<span id="svcstatus">status unknown</span>) <input type="button"
     value="Clear" onclick="clearServices(); window.location.reload()" /></p>
 
-  <p><textarea id="svctext"></textarea></p>
+  <p id="svcs"></p>
 
   <p>Additional services (separate with spaces):</p>
-  <p><textarea id="extras" onchange="setExtraServices(this.value)"
-    cols="70"></textarea></p>
+  <p><textarea id="extras" cols="70"></textarea></p>
 
-  <p><input id="munge" type="checkbox" onchange="setMunge(this.checked)" />
-    <label for="munge">Change link text to long URL if it matches
-    short URL</label></p>
+  <p><input id="munge" type="checkbox" /><label for="munge">Change link text
+    to long URL if it matches short URL</label></p>
+
+  <p><input type="button" value="Save Options" onclick="save();" /></p>
 </body>
 </html>
