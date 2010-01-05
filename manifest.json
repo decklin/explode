@@ -2,8 +2,8 @@
   "name": "Explode",
   "version": "0.7",
   "icons": {
-    "32": "icon32.png",
-    "48": "icon48.png"
+    "32": "explode-32.png",
+    "48": "explode-48.png"
   },
   "description": "Expand shortened URLs (e.g. TinyURL) with LongURL",
   "background_page": "background.html",
