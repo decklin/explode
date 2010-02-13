@@ -7,7 +7,7 @@ const DEFAULT_EXTRAS = [
     'disq.us',
     'dlvr.it',
     'flic.kr',
-    'goog.gl',
+    'goo.gl',
     'guao.cc',
     'j.mp',
     'jan.io',
