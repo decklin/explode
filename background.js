@@ -1,4 +1,4 @@
-const USER_AGENT = 'Explode/0.8';
+const USER_AGENT = 'Explode/0.8.2';
 const API_ROOT = 'http://api.longurl.org/v2/';
 const FETCH_DELAY = 500;
 const SERVICES_CACHE_TIME = 86400 * 1000;
