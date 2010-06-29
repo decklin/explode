@@ -15,6 +15,7 @@ const DEFAULT_EXTRAS = [
     'ouj.de',
     'ow.ly',
     'sn.im',
+    't.co',
     'tcrn.ch',
     'urlz.at',
     'w33.us'
