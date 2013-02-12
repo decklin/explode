@@ -9,7 +9,7 @@ function each(list, f) { for (var i = 0; i < list.length; i++) f(list[i]); }
 chrome.extension.sendRequest({servicesPlease: true}, function(res) {
     reqLinks(document, res.services);
     document.body.addEventListener('DOMNodeInserted', function(ev) {
-        if (ev.srcElement.nodeType != 3)
+        if (ev.srcElement.nodeType != 3 && ev.srcElement.nodeType != 8)
             reqLinks(ev.srcElement, res.services);
     });
 });
